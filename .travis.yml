@@ -1,0 +1,26 @@
+sudo: required
+language: generic
+services:
+- docker
+
+env:
+  global:
+  - COMMIT=${TRAVIS_COMMIT::8}
+  - REPO=jtdoepke/botpress
+  - CGO_ENABLED=0
+  - secure: "icJdBP6W4L1nyBFAxOH1Nl0QtIuGg99pqZJtGRoCLSZfnjizuMzjQvgqB8OxRzJWFaxRVeVZmJPPJZ6E4bqX26ihOzKmj/PLulbSc/SF1CmQ7OpniSX0Sh3iG16fqoq5vWOmbMueOSCdE6rq06RZTJuvhUEg0gYnWtaq1IM4hgYkayjzjyLdpmiKgRXyD0wPxyVpoCk8GDoiEw07/RnboZqnc99ucbCxVmAShMjO8hKVWaqG/v81bjBqUW9nf4pyYbYjiLQCPAqs7dI4TCWr75bzB3Z1LcwaT0gzCpwi87lKOu5PzQic13H7LvGHBjFhDGnfH/4o6GkBnO0f1TC0QBCsxuIgUNKxXyTtmaFtI84ou3Sa6nyVksvw0A+ZsChljCg0v00pyeFoXsnvyzmcBNs5xOtYBEyPe3Z5q7qqPOUmgfUVVIWJygMFP/8U7h5YlEeTZv4PjkciJ7+W5LTS7flWy+qOJVe78PlswmP13tvqgjzQvhZg0EWTx7csYC1Mu5rB9tBoc3WyJFOcAnemyfViowXqCsDqP5HOOhbIcjh858wukeyABuAf6y8unD95dxQUozjzmzb3JZdxbO+DJYIidKR5RtsxFs+ZFL7fFSQJva02/GM5z2RtDhMZ9AlmX4TdpI/ZXSa59x/CMbocncjCLQYpdf2EDtQPSnpPeh4=" # DOCKER_USERNAME
+  - secure: "ZInmpcn7kGur4Af1bWuKltKSGP78XubZmX8fnD1zwBj464TElCp1Zx7O36IjYrto3MljeJclfCeifmi/mM9seqCBZTmAqe81dqhSN38jioUQEP/qVLJ2XDLx4VjdINinoRgAEbLbj0qEI1cEi5Tug5lHfK9fjIqfE9BzhC+xYYoU3Kn+FaQa+kj94aU7FgNvj5vRUNX+HoI8flLtFE6GrCwOWdddBJxv4JnE2K5PmihXOV04MdJnAxlwMdz7Eu8DbJoI+dWUxUndXYlOPVgVpTGqn4AnDS/uMZ8f3OXg5idoPhu3j9DloD+JugeBWiMDrxcIKnIPFzN5JY1xFC/LMTKeB8ttuJ4/FAggzDbQ1jBGfG3SPXZF8Uk0fTqurnuNGHaFlaKue1DUnPY4afbUJtJ5Ki/9D+k/48Qgc7kFLoUu7CBXRtOKniXSKLkR2icqmwjHrb0NlDTZJ3GPmDa8wM1aPdeiWHCo3JUFrvZy3xCN7FgjdggQLqO3E4G3d8Kw2Ypel0FHUjn4egHeJp+VgizKQ+JbuVQW830/56Dz1eBirxfOKsDI9XH4tLCCDgwZMA7fpVR/P25IuA//ffrE3E1L6Xt9k8PyOE6QM/1XYwj4ep5ePzHh8af6hLhgE8zK8tyDxpOmA/r3i+OcuLPAe/njtFrL1ympenBhtVxqXhY=" # DOCKER_API_KEY
+
+script:
+- docker build -t $REPO:$COMMIT -f Dockerfile .
+
+after_success:
+- docker login -u "$DOCKER_USERNAME" -p "$DOCKER_API_KEY"
+- if [ "$TRAVIS_BRANCH" == "master" ]; then
+      docker tag $REPO:$COMMIT $REPO:latest;
+      docker push $REPO:latest;
+  fi
+- if [ -n "${TRAVIS_TAG}" ]; then
+      docker tag $REPO:$COMMIT "$REPO:${TRAVIS_TAG:1}";
+      docker push "$REPO:${TRAVIS_TAG:1}";
+  fi
