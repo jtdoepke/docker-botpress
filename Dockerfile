@@ -11,7 +11,7 @@ WORKDIR '/data'
 EXPOSE 3000
 CMD ["start"]
 
-ARG botpress_version=1.0.2
+ARG botpress_version=1.0.3
 
 LABEL org.label-schema.schema-version="1.0" \
       org.label-schema.name="botpress" \
